@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,47 +10,87 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <ImageView
-            android:id="@+id/ivImage"
+        <!-- Image Preview -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="@android:color/darker_gray"
-            android:scaleType="centerCrop"/>
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp">
 
-        <Button
+            <ImageView
+                android:id="@+id/ivImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@android:color/darker_gray"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Select Image Button -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSelectImage"
             android:text="Select Image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="12dp"
+            style="@style/Widget.Material3.Button.OutlinedButton"/>
 
-        <EditText
-            android:id="@+id/etTitle"
-            android:hint="Issue Title"
+        <!-- Title -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"/>
+            android:layout_marginTop="16dp">
 
-        <EditText
-            android:id="@+id/etDescription"
-            android:hint="Description"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTitle"
+                android:hint="Issue Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Description -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"/>
+            android:layout_marginTop="16dp">
 
-        <EditText
-            android:id="@+id/etType"
-            android:hint="Issue Type (Road, Garbage, Light...)"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDescription"
+                android:hint="Describe the issue in detail"
+                android:minLines="3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Issue Type -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"/>
+            android:layout_marginTop="16dp">
 
-        <Button
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etType"
+                android:hint="Issue Type (Road, Garbage, Light...)"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- AI Progress -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:visibility="gone"/>
+
+        <!-- Submit -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubmit"
             android:text="Submit Issue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="24dp"
+            app:cornerRadius="12dp"/>
 
     </LinearLayout>
 

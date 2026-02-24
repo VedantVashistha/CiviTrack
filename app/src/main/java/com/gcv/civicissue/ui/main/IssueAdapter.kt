@@ -40,6 +40,18 @@ class IssueAdapter(
         holder.binding.tvDescription.text = issue.description
         holder.binding.tvType.text = "Type: ${issue.type}"
         holder.binding.tvStatus.text = "Status: ${issue.status}"
+        holder.binding.tvEstimated.text = "Estimated Time: ${issue.estimatedHours} hrs"
+
+        holder.binding.tvSeverity.text = "Severity: ${issue.severity}"
+
+        val color = when (issue.severity) {
+            "Critical" -> android.graphics.Color.RED
+            "High" -> android.graphics.Color.parseColor("#FF5722")
+            "Medium" -> android.graphics.Color.parseColor("#FFC107")
+            else -> android.graphics.Color.parseColor("#4CAF50")
+        }
+
+        holder.binding.tvSeverity.setTextColor(color)
 
         // 🔥 Status Color Coding
         when (issue.status) {

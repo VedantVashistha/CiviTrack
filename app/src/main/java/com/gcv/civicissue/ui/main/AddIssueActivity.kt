@@ -1,28 +1,42 @@
 package com.gcv.civicissue.ui.main
 
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.gcv.civicissue.data.model.Issue
-import com.gcv.civicissue.data.repository.FirebaseRepository
+import com.gcv.civicissue.data.model.AiAnalysis
+import com.gcv.civicissue.data.remote.AiApiService
+import com.gcv.civicissue.data.remote.DescriptionRequest
 import com.gcv.civicissue.databinding.ActivityAddIssueBinding
+import com.gcv.civicissue.utils.RetrofitClient
 import com.google.firebase.firestore.FirebaseFirestore
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.ByteArrayOutputStream
-import java.util.*
+import java.util.UUID
 
 class AddIssueActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddIssueBinding
-    private var imageBase64: String = ""
     private val firestore = FirebaseFirestore.getInstance()
-    private val repo = FirebaseRepository()
+    private var selectedImageBase64: String = ""
+
+    private val imagePicker =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                binding.ivImage.setImageURI(it)
+                val bitmap =
+                    MediaStore.Images.Media.getBitmap(contentResolver, it)
+                selectedImageBase64 = convertBitmapToBase64(bitmap)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,65 +44,102 @@ class AddIssueActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnSelectImage.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, 100)
+            imagePicker.launch("image/*")
         }
 
         binding.btnSubmit.setOnClickListener {
-
-            val title = binding.etTitle.text.toString().trim()
-            val desc = binding.etDescription.text.toString().trim()
-            val type = binding.etType.text.toString().trim()
-
-            if (title.isEmpty() || desc.isEmpty() || type.isEmpty() || imageBase64.isEmpty()) {
-                Toast.makeText(this, "All fields required", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val id = UUID.randomUUID().toString()
-
-            val issue = Issue(
-                id = id,
-                title = title,
-                description = desc,
-                type = type,
-                imageBase64 = imageBase64,
-                userId = repo.getCurrentUserId() ?: ""
-            )
-
-            firestore.collection("issues")
-                .document(id)
-                .set(issue)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Issue Submitted!", Toast.LENGTH_SHORT).show()
-                    finish()
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.slide_out_right)
-                    finish()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
-                }
+            submitIssue()
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun submitIssue() {
 
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-            val uri: Uri? = data?.data
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+        val title = binding.etTitle.text.toString().trim()
+        val description = binding.etDescription.text.toString().trim()
+        val type = binding.etType.text.toString().trim()
 
-            binding.ivImage.setImageBitmap(bitmap)
-            imageBase64 = convertBitmapToBase64(bitmap)
+        if (title.isEmpty() || description.isEmpty() || type.isEmpty()) {
+            Toast.makeText(this, "All fields required", Toast.LENGTH_SHORT).show()
+            return
         }
+
+        binding.progressBar.visibility = View.VISIBLE
+
+        val api = RetrofitClient.instance.create(AiApiService::class.java)
+        val request = DescriptionRequest(description)
+
+        api.analyzeIssue(request).enqueue(object : Callback<AiAnalysis> {
+
+            override fun onResponse(
+                call: Call<AiAnalysis>,
+                response: Response<AiAnalysis>
+            ) {
+                Log.d("AI_DEBUG", "Code: ${response.code()}")
+                Log.d("AI_DEBUG", "Body: ${response.body()}")
+
+                if (!response.isSuccessful || response.body() == null) {
+                    Log.e("AI_DEBUG", "Parsing failed")
+                    Toast.makeText(this@AddIssueActivity, "PARSE FAILURE", Toast.LENGTH_LONG).show()
+                    saveIssue(title, description, type, "Low", 48)
+                    return
+                }
+
+                val severity = response.body()!!.severity
+                val hours = response.body()!!.hours
+
+                saveIssue(title, description, type, severity, hours)
+            }
+
+            override fun onFailure(call: Call<AiAnalysis>, t: Throwable) {
+                Toast.makeText(this@AddIssueActivity, "NETWORK FAILURE", Toast.LENGTH_LONG).show()
+                Log.e("AI_DEBUG", "Network error: ${t.message}")
+                saveIssue(title, description, type, "Low", 48)
+            }
+        })
+
+        Log.d("AI_DEBUG", "Calling URL: ${RetrofitClient.instance.baseUrl()}")
+
+    }
+
+    private fun saveIssue(
+        title: String,
+        description: String,
+        type: String,
+        severity: String,
+        hours: Int
+    ) {
+
+        val issueId = UUID.randomUUID().toString()
+
+        val issue = Issue(
+            id = issueId,
+            title = title,
+            description = description,
+            type = type,
+            status = "Pending",
+            imageBase64 = selectedImageBase64,
+            severity = severity,
+            estimatedHours = hours,
+            timestamp = System.currentTimeMillis()
+        )
+
+        firestore.collection("issues")
+            .document(issueId)
+            .set(issue)
+            .addOnSuccessListener {
+                binding.progressBar.visibility = View.GONE
+                Toast.makeText(this, "Issue Reported", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            .addOnFailureListener {
+                binding.progressBar.visibility = View.GONE
+                Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun convertBitmapToBase64(bitmap: Bitmap): String {
-        val resized = Bitmap.createScaledBitmap(bitmap, 600, 600, true)
         val stream = ByteArrayOutputStream()
-        resized.compress(Bitmap.CompressFormat.JPEG, 60, stream)
-        val bytes = stream.toByteArray()
-        return Base64.encodeToString(bytes, Base64.DEFAULT)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream)
+        return Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT)
     }
 }

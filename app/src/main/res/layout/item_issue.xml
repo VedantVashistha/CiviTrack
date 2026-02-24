@@ -55,6 +55,19 @@
             android:layout_marginTop="6dp"
             android:textColor="?attr/colorPrimary"/>
 
+        <TextView
+            android:id="@+id/tvSeverity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="6dp"/>
+
+        <TextView
+            android:id="@+id/tvEstimated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"/>
+
         <!-- Status Badge -->
         <TextView
             android:id="@+id/tvStatus"
