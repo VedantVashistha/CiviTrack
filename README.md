@@ -1,123 +1,160 @@
-🚀 CiviTrack – AI Powered Civic Issue Reporting App
+# 🚀 CiviTrack – AI Powered Civic Issue Reporting App
 
-CiviTrack is a full-stack Android application built using Kotlin, Firebase, and Node.js, integrated with AI-powered severity classification to intelligently prioritize civic issues.
+CiviTrack is a full-stack Android application built using **Kotlin, Firebase, and Node.js**.  
+It enables citizens to report civic issues while intelligently prioritizing them using AI-based severity detection and estimated resolution time prediction.
 
-The system not only allows citizens to report problems, but also automatically analyzes each issue using AI and estimates how urgently it should be resolved.
+The system bridges the communication gap between citizens and authorities through automated risk classification and structured resolution timelines.
 
-🧠 AI-Based Severity Classification
+---
+
+## 🧠 AI-Based Severity Classification
 
 When a user submits an issue:
 
-The Android app sends the issue description to the deployed backend (hosted on Railway).
+1. The Android app sends the issue description to the deployed backend (hosted on Railway).
+2. The backend (**CivicAIBackend**) processes the description using **Gemini AI**.
+3. The AI strictly classifies the issue into predefined severity categories.
+4. The backend returns:
+   - Severity Level
+   - Estimated Resolution Time (in hours)
+5. The result is stored in Firebase Firestore and displayed in the app UI.
 
-The backend (CivicAIBackend) processes the description using Gemini AI.
+This ensures intelligent prioritization instead of manual classification.
 
-The AI strictly classifies the issue into predefined categories.
+---
 
-The backend returns:
+## ⚡ Severity Logic Used by AI
 
-🔴 Severity Level
+### 🔴 Critical
+- Examples: Gas leak, fire, explosion, building collapse  
+- Estimated Resolution Time: **1 hour**
 
-⏱ Estimated Resolution Time (in hours)
+### 🟠 High
+- Examples: Electrical hazard, major flooding  
+- Estimated Resolution Time: **6 hours**
 
-The result is stored in Firebase Firestore and displayed in the app UI.
+### 🟡 Medium
+- Examples: Potholes, broken streetlight  
+- Estimated Resolution Time: **24 hours**
 
-📊 Severity Logic Used
+### 🟢 Low
+- Examples: Garbage, noise, minor inconvenience  
+- Estimated Resolution Time: **48 hours**
 
-The AI follows strict classification rules:
+---
 
-Severity	Examples	Estimated Resolution Time
-Critical	Gas leak, fire, explosion, building collapse	1 hour
-High	Electrical hazard, major flooding	6 hours
-Medium	Potholes, broken streetlight	24 hours
-Low	Garbage, noise, minor issues	48 hours
+## 📦 Example Backend Response
 
-The backend ensures the response is returned in strict JSON format:
-
+```json
 {
-  "severity": "Low | Medium | High | Critical",
-  "hours": number
+  "severity": "Critical",
+  "hours": 1
 }
+```
 
-This ensures consistency, reliability, and easy integration with the Android frontend.
+The backend enforces strict JSON formatting to ensure consistency and seamless Android integration.
 
-📱 Features
+---
 
-🔐 Firebase Authentication
+## 📱 Core Features
 
-📝 Issue reporting with description & category
+- 🔐 Firebase Authentication (Login / Signup)
+- 📝 Issue reporting with description
+- 🤖 AI-powered automatic severity detection
+- ⏳ Predicted resolution time display
+- 📂 Real-time cloud storage using Firestore
+- 👤 Role-based dashboards (User / Resolver)
+- 🌐 Railway-hosted backend integration
+- 🔄 REST API communication
 
-🤖 AI-based automatic severity detection
+---
 
-⏳ Estimated resolution time display
+## 🏗 System Architecture
 
-📂 Real-time storage with Firebase Firestore
+```
+Android App
+    ↓
+Railway Hosted Backend (Node.js + Express)
+    ↓
+Gemini AI Classification
+    ↓
+Severity + Resolution Time
+    ↓
+Firebase Firestore Storage
+    ↓
+Displayed in Android UI
+```
 
-👤 Role-based dashboard (User / Resolver)
+---
 
-🌐 Deployed backend on Railway
+## 🛠 Technology Stack
 
-🛠 Tech Stack
+### 📱 Android (Frontend)
+- Kotlin
+- XML Layouts
+- ViewBinding
+- RecyclerView
+- Material Design Components
 
-Frontend (Android)
+### 🌐 Backend
+- Node.js
+- Express.js
+- Gemini AI API
+- Railway Deployment
 
-Kotlin
+### ☁ Database & Authentication
+- Firebase Authentication
+- Firebase Firestore
 
-XML + ViewBinding
+---
 
-RecyclerView
+## ⚙️ Setup Instructions
 
-Material Design
+1. Clone the repository:
+   ```
+   git clone https://github.com/YOUR_USERNAME/CiviTrack.git
+   ```
 
-Backend
+2. Open the project in Android Studio.
 
-Node.js + Express
+3. Add your own `google-services.json` file inside:
+   ```
+   app/
+   ```
 
-Gemini AI API
+4. Replace the backend base URL with your deployed Railway URL.
 
-Railway Deployment
+5. Sync Gradle and run the app.
 
-Database & Auth
+---
 
-Firebase Authentication
+## 🔐 Security Practices
 
-Firebase Firestore
+- `.env` file is excluded from backend repository
+- Firebase configuration file is not included
+- API keys are stored securely using environment variables
+- No sensitive credentials are hardcoded
 
-⚙️ Setup Instructions
+---
 
-Clone the repository
-
-Add your own google-services.json inside app/
-
-Replace backend base URL with your deployed backend
-
-Run the app in Android Studio
-
-🔐 Security Notes
-
-.env file is excluded from backend repository.
-
-Firebase configuration file is not included for security reasons.
-
-API keys are stored securely in environment variables.
-
-💡 Why CiviTrack?
+## 💡 Project Highlights
 
 This project demonstrates:
 
-Full-stack mobile application development
+- Full-stack mobile application development
+- Real-world AI integration in civic tech
+- REST API architecture
+- Cloud deployment workflow
+- Role-based system design
+- Clean modular Android architecture
 
-AI integration in real-world use case
+---
 
-REST API communication
+## 👨‍💻 Developed By
 
-Cloud deployment
+**Vedant Vashistha**  
+B.Tech CSE | IIIT Kota  
 
-Role-based architecture
+---
 
-Clean modular design
-
-👨‍💻 Developed By
-
-Vedant Vashistha
-B.Tech CSE | IIIT Kota
+⭐ If you found this project interesting, consider starring the repository.
