@@ -1,97 +1,123 @@
-# 🚀 NagarSetu – Civic Issue Reporting App
+🚀 CiviTrack – AI Powered Civic Issue Reporting App
 
-NagarSetu is a modern Android application built using **Kotlin and Firebase** that enables citizens to report civic issues in their locality and track their resolution status in real time.
+CiviTrack is a full-stack Android application built using Kotlin, Firebase, and Node.js, integrated with AI-powered severity classification to intelligently prioritize civic issues.
 
-Designed with a clean UI and structured architecture, the app ensures seamless communication between users and authorities.
+The system not only allows citizens to report problems, but also automatically analyzes each issue using AI and estimates how urgently it should be resolved.
 
----
+🧠 AI-Based Severity Classification
 
-## 📱 Features
+When a user submits an issue:
 
-- 🔐 User Authentication (Firebase Auth)
-- 📝 Report civic issues with title, description & category
-- 📂 Real-time issue storage using Firebase Firestore
-- 🔄 Live status tracking (Pending / Resolved)
-- 👤 Role-based access (User / Resolver)
-- 📊 RecyclerView-based issue listing
-- ⚡ Smooth and responsive Material UI
+The Android app sends the issue description to the deployed backend (hosted on Railway).
 
----
+The backend (CivicAIBackend) processes the description using Gemini AI.
 
-## 🛠 Tech Stack
+The AI strictly classifies the issue into predefined categories.
 
-- **Language:** Kotlin  
-- **Architecture:** XML + ViewBinding  
-- **Backend:** Firebase Authentication & Firestore  
-- **UI Components:** RecyclerView, Material Design  
-- **IDE:** Android Studio  
+The backend returns:
 
----
+🔴 Severity Level
 
-## 📦 Project Structure
-com.gcv.civicissue
-│
-├── ui.auth → Login & Signup
-├── ui.main → Issue Listing
-├── ui.resolver → Resolver Dashboard
-├── model → Data classes
-└── utils → Helper classes
+⏱ Estimated Resolution Time (in hours)
 
----
+The result is stored in Firebase Firestore and displayed in the app UI.
 
-## ⚙️ Setup Instructions (For Developers)
+📊 Severity Logic Used
 
-1. Clone the repository: git clone https://github.com/VedantVashistha/CiviTrack.git
-   
-2. Open in Android Studio.
+The AI follows strict classification rules:
 
-3. Add your own `google-services.json` file inside:
-   
-You can download it from Firebase Console after creating your own project.
+Severity	Examples	Estimated Resolution Time
+Critical	Gas leak, fire, explosion, building collapse	1 hour
+High	Electrical hazard, major flooding	6 hours
+Medium	Potholes, broken streetlight	24 hours
+Low	Garbage, noise, minor issues	48 hours
 
-4. Sync Gradle and run the app.
+The backend ensures the response is returned in strict JSON format:
 
----
+{
+  "severity": "Low | Medium | High | Critical",
+  "hours": number
+}
 
-## 🔐 Important
+This ensures consistency, reliability, and easy integration with the Android frontend.
 
-The `google-services.json` file is not included for security reasons.  
-Please configure your own Firebase project before running.
+📱 Features
 
----
+🔐 Firebase Authentication
 
-## 💡 Why CiviTrack?
+📝 Issue reporting with description & category
+
+🤖 AI-based automatic severity detection
+
+⏳ Estimated resolution time display
+
+📂 Real-time storage with Firebase Firestore
+
+👤 Role-based dashboard (User / Resolver)
+
+🌐 Deployed backend on Railway
+
+🛠 Tech Stack
+
+Frontend (Android)
+
+Kotlin
+
+XML + ViewBinding
+
+RecyclerView
+
+Material Design
+
+Backend
+
+Node.js + Express
+
+Gemini AI API
+
+Railway Deployment
+
+Database & Auth
+
+Firebase Authentication
+
+Firebase Firestore
+
+⚙️ Setup Instructions
+
+Clone the repository
+
+Add your own google-services.json inside app/
+
+Replace backend base URL with your deployed backend
+
+Run the app in Android Studio
+
+🔐 Security Notes
+
+.env file is excluded from backend repository.
+
+Firebase configuration file is not included for security reasons.
+
+API keys are stored securely in environment variables.
+
+💡 Why CiviTrack?
 
 This project demonstrates:
 
-- Full-stack Android development
-- Firebase integration
-- Clean architecture implementation
-- Role-based logic handling
-- Real-time cloud database operations
+Full-stack mobile application development
 
----
+AI integration in real-world use case
 
-## 📷 Future Improvements
+REST API communication
 
-- Image upload using Firebase Storage
-- Push notifications
-- Location-based issue tagging
-- Admin analytics dashboard
+Cloud deployment
 
----
+Role-based architecture
 
-## 👨‍💻 Developed By
+Clean modular design
 
-Vedant Vashistha  
-B.Tech CSE | IIIT Kota  
+👨‍💻 Developed By
 
----
-
-⭐ If you like the project, feel free to star the repository!
-
-
-
-
-
-
+Vedant Vashistha
+B.Tech CSE | IIIT Kota
